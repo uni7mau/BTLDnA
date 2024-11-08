@@ -1,0 +1,63 @@
+7
+231230898
+Nguyen Duc Thach
+19
+Male
+Hai Duong
+Chef
+231239999
+Nguyen Van A
+20
+Male
+Ha Noi
+Served
+231230900
+Nguyen Thi B
+23
+Female
+Thai Binh
+Receptionist
+231232901
+Ho Viet Tung
+34
+Male
+Ha Noi
+Served
+231230902
+Hoang Nam
+30
+Male
+Lam Dong
+Bartender
+231231021
+Pham Thi C
+25
+Female
+Lam Dong
+Chef
+231230832
+Pham Thi E
+16
+Female
+Cao Bang
+Served
+
+231239999
+
+231234123
+Nhan Vien Moi
+25
+Male
+Ha Noi
+Bartender
+
+231230898
+
+All
+11.6
+8
+9
+1.2
+5.2
+5
+2.2

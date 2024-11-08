@@ -1,0 +1,2 @@
+    // func.calculateWage();
+    // func.expData();
