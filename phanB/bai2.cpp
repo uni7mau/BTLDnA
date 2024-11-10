@@ -30,9 +30,17 @@ class DoubleListIterator {
 			this->curr = tmp.getCurr();
 			return *this;
 		}
+        bool operator == (DoubleListIterator<T> tmp) {
+            return curr == tmp.getCurr();
+        }
 		bool operator != (DoubleListIterator<T> tmp) {
 			return curr != tmp.getCurr();
 		}
+        DoubleListIterator<T> operator + (int t) {
+            Node<T> *temp = curr;
+            while (t--) temp = temp->getNext();
+            return temp;
+        }
 		DoubleListIterator<T> operator ++ (int) {
 			Node<T> *temp = curr;
 			curr = curr->getNext();
@@ -42,15 +50,32 @@ class DoubleListIterator {
 			curr = curr->getNext();
 			return curr;
 		}
-        DoubleListIterator<T> operator -- (int) {
-            Node<T> *temp = curr;
-            curr = curr->getPrev();
-            return temp;
-        }
-        DoubleListIterator<T> operator -- () { 
-            curr = curr->getPrev();
-            return curr;
-        }
+		T &operator * () { return curr->getVal(); }       
+};
+
+template<class T>
+class DoubleListReverseIterator {
+    Node<T> *curr;
+    public:
+        DoubleListReverseIterator() { curr = nullptr; }
+        DoubleListReverseIterator(Node<T> *tmp) { curr = tmp; }
+        Node<T> *getCurr() { return curr; }
+		DoubleListReverseIterator<T> &operator = (DoubleListReverseIterator<T> tmp) {
+			this->curr = tmp.getCurr();
+			return *this;
+		}
+		bool operator != (DoubleListReverseIterator<T> tmp) {
+			return curr != tmp.getCurr();
+		}
+		DoubleListReverseIterator<T> operator ++ (int) {
+			Node<T> *temp = curr;
+			curr = curr->getPrev();
+			return temp;
+		}
+		DoubleListReverseIterator<T> operator ++ () {
+			curr = curr->getPrev();
+			return curr;
+		}
 		T &operator * () { return curr->getVal(); }       
 };
 
@@ -66,8 +91,8 @@ class DoubleList {
         }
         DoubleListIterator<T> begin() { return head; }
         DoubleListIterator<T> end() { return nullptr; }
-        DoubleListIterator<T> rbegin() { return tail; }
-        DoubleListIterator<T> rend() { return nullptr; }
+        DoubleListReverseIterator<T> rbegin() { return tail; }
+        DoubleListReverseIterator<T> rend() { return nullptr; }
         int size() { return n; }
         bool empty() { return n == 0; }
         T &front() { return head->getVal(); }
@@ -107,34 +132,37 @@ class DoubleList {
                 n--;
             }
         }
-        void insert(int pos, T val) {
-            if (pos < 0 || pos >= n) return;
-            if (pos == 0) push_front(val);
-            else if (pos == n-1) push_back(val);
-            else {
-                Node<T> *newNode(val, nullptr);
-                Node<T> *currNode = head;
-                for (int i = 0; i < pos; i++) {
-                    currNode = currNode->next();
-                }
-                newNode->setPrev(currNode->getPrev());
-                newNode->setNext(currNode);
-                currNode->getPrev()->setNext(newNode);
-                currNode->setPrev(newNode);
-            }  
-        }
-        void erase(int pos) {
-            if (pos < 0 || pos >= n) return;
-            else {
-                if (pos == 0) pop_front();
-                else if (pos == n-1) pop_back();
-                else {
-                    Node<T> *currNode = head;
-                    for (int i = 0; i < pos; i++) currNode = currNode->getNext();
-                    currNode->setNext(currNode->getNext()->getNext());
-                    currNode->getNext()->getNext()->setPrev(currNode);
-                }
+        void insert(DoubleListIterator<T> it, T val) {
+            if (it == end()) {
+                push_back(val);
+                return ;
             }
+
+            Node<T> *pos = it.getCurr();
+            Node<T> *newNode = new Node<T>(val);
+
+            newNode->setNext(pos);
+            newNode->setPrev(pos->getPrev());
+
+            if (pos->getPrev()) pos->getPrev()->setNext(newNode);
+            pos->setPrev(newNode);
+            if (pos == head) head = newNode;
+        }
+        void erase(DoubleListIterator<T> it) {
+            Node<T> *nodeToDelete = it.getCurr();
+            if (nodeToDelete->getNext()) {
+                nodeToDelete->getNext()->setPrev(nodeToDelete->getPrev());
+            }
+            if (nodeToDelete->getPrev()) {
+                nodeToDelete->getPrev()->setNext(nodeToDelete->getNext());
+            }
+            if (nodeToDelete == head) {
+                head = nodeToDelete->getNext();
+            }
+            if (nodeToDelete == tail) {
+                tail = nodeToDelete->getPrev();
+            }
+            delete nodeToDelete;
         }
 
         void delDupp() {
@@ -155,30 +183,11 @@ class DoubleList {
         }
 
         void incSort() {
-            if (head == nullptr || n == 1) return ;
-            Node<T> *sortedHead = nullptr;
+            head = MergeSort(head);
+
             Node<T> *curr = head;
-            while (curr != nullptr) {
-                Node<T> *next = curr->getNext();
-                if (sortedHead == nullptr || sortedHead->getVal() >= curr->getVal()) {
-                    curr->setNext(sortedHead);
-                    if (sortedHead != nullptr) sortedHead->setPrev(curr);
-                    sortedHead = curr;
-                    sortedHead->setPrev(nullptr);
-                } else {
-                    Node<T> *current_sorted = sortedHead;
-                    while (current_sorted->getNext() != nullptr && current_sorted->getNext()->getVal() < curr->getVal()) {
-                        current_sorted = current_sorted->getNext();
-                    }
-                    curr->setNext(current_sorted->getNext());
-                    if (current_sorted->getNext() != nullptr)  current_sorted->getNext()->getPrev() = curr;
-                    current_sorted->setNext(curr);
-                    curr->setPrev(current_sorted);
-                }
-                if (curr->getNext() != nullptr) tail = curr->getNext();
-                curr = next;
-            }
-            head = sortedHead;
+            while (curr->getNext() != nullptr) curr = curr->getNext();
+            tail = curr;
         }
 
         void incInsert(T val) {
@@ -200,6 +209,53 @@ class DoubleList {
             x = t;
         }
 };
+
+template <class T>
+Node<T> *split(Node<T> *head) {
+    Node<T> *fast = head;
+    Node<T> *slow = head;
+    while (fast != NULL && fast->getNext() != NULL && fast->getNext()->getNext() != NULL) {
+        fast = fast->getNext()->getNext();
+        slow = slow->getNext();
+    }
+    Node<T> *temp = slow->getNext();
+    slow->setNext(NULL);
+    if (temp != NULL) temp->setPrev(NULL);
+    return temp;
+}
+
+template <class T>
+Node<T> *merge(Node<T> *first, Node<T> *second) {
+    if (first == NULL) return second;
+    if (second == NULL) return first;
+
+    if (first->getVal() < second->getVal()) {
+        first->setNext(merge(first->getNext(), second));
+        if (first->getNext() != NULL) {
+            first->getNext()->setPrev(first);
+        }
+        first->setPrev(NULL);
+        return first;
+    } else {
+        second->setNext(merge(first, second->getNext()));
+        if (second->getNext() != NULL) {
+            second->getNext()->setPrev(second);
+        }
+        second->setPrev(NULL);
+        return second;
+    }
+}
+
+template <class T>
+Node<T> *MergeSort(Node<T> *head) {
+    if (head == NULL || head->getNext() == NULL) {
+        return head;
+    }
+    Node<T> *second = split(head);
+    head = MergeSort(head);
+    second = MergeSort(second);
+    return merge(head, second);
+}
 
 Shelter() {
     freopen("inp.txt", "r", stdin);
@@ -246,7 +302,19 @@ Shelter() {
     endFunc;
 
     cout << "Decrease export: ";
-    for (auto it = dList.rbegin(); it != dList.rend(); it--) {
+    for (auto it = dList.rbegin(); it != dList.rend(); it++) {
         cout << *it << " ";
     }
+
+    endFunc;
+
+    dList.insert(dList.begin() + 4, 5);
+    cout << "Insert test: ";
+    for (auto x:dList) cout << x << " ";
+
+    endFunc;
+
+    dList.erase(dList.begin() + 4);
+    cout << "Erase test: ";
+    for (auto x:dList) cout << x << " ";
 }
