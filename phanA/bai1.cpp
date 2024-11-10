@@ -138,24 +138,11 @@ class StaffManage {
         }
         //Function 2: xóa nhân viên theo ID
         void del(string inpId) {
-            if (mode == "ID") {
-                int l = 0, r = sVect.size()-1;
-                while (l <= r) {
-                    int m = l + (r-l)/2;
-                    if (sVect[m].getId() == inpId) {
-                        sVect.erase(sVect.begin()+m);
-                        return ;
-                    }
-                    if (sVect[m].getId() < inpId) l = m + 1;
-                    if (sVect[m].getId() > inpId) r = m - 1;
-                }
-            } else {
-                for (int i = 0; i < sVect.size(); i++) {
-                    if (sVect[i].getId() == inpId) {
-                        cout << "[Alert] Da xoa 1 nhan vien: " << sVect[i].getId() << "\n";
-                        sVect.erase(sVect.begin() + i);
-                        return;
-                    }
+            for (int i = 0; i < sVect.size(); i++) {
+                if (sVect[i].getId() == inpId) {
+                    sVect.erase(sVect.begin() + i);
+                    cout << "[Alert] Da xoa 1 nhan vien: " << sVect[i].getId() << "\n";
+                    return;
                 }
             }
             cout << "[Error] Khong tim thay nhan vien " << inpId << " trong du lieu!\n";
@@ -175,8 +162,7 @@ class StaffManage {
             } else {
                 cout << "[Error] Khong tim thay nhan vien " << needFixId << " trong du lieu!\n";
             }
-            
-        } 
+        }
         //Function 4: Sắp xếp nhân viên theo kiểu đầu vào cho trước
         friend bool wageCmp(Staff a, Staff b);
         friend void staffSort(vector<Staff> &v, string mode);
@@ -222,10 +208,23 @@ class StaffManage {
         //Function 7: Tính lương theo thời gian làm việc nhập từ bàn phím
         void calWage(string type, string inpId, vector<float> wTime) {
             if (type == "One") {
-                for (int i = 0; i < sVect.size(); i++) {
-                    if (sVect[i].getId() == inpId) {
-                        sVect[i].getWageAtr().calWage(wTime[0]);
-                        return;
+                if (mode == "ID") {
+                    int l = 0, r = sVect.size()-1;
+                    while (l <= r) {
+                        int m = l + (r-l)/2;
+                        if (sVect[m].getId() == inpId) {
+                            sVect[m].getWageAtr().calWage(wTime[0]);
+                            break;
+                        }
+                        if (sVect[m].getId() < inpId) l = m + 1;
+                        if (sVect[m].getId() > inpId) r = m - 1;
+                    }
+                } else {
+                    for (int i = 0; i < sVect.size(); i++) {
+                        if (sVect[i].getId() == inpId) {
+                            sVect[i].getWageAtr().calWage(wTime[i]);
+                            break;
+                        }
                     }
                 }
             } else {
