@@ -61,3 +61,22 @@ All
 5.2
 5
 2.2
+
+
+7 8 3 1 0 9
+3 2 8 7 3 1
+
+h2sn 1 : ms(8, null)
+h2sn 3 : ms(8, 1)
+h2sn 7 : ms(8, 3)
+h2sn 8 : ms(8, 7)
+h1sn 7 : ms(8, 8)
+h2sn 2 : ms(7, 8)
+h2sn 3 : ms(7, 2)
+
+return 8
+h2sp 8 : null
+
+1n = 8
+0 2 4 8
+1 3 7 9

@@ -131,12 +131,10 @@ class StaffManage {
             sVect.insert(sVect.begin() + currPos, stf);
         }
         
-        //Function 1: thêm nhân viên
         void getInp(Staff newStaff) {
             insert(newStaff);
             cout << "[Alert] Da them nhan vien co ID: " << newStaff.getId() << "\n";
         }
-        //Function 2: xóa nhân viên theo ID
         void del(string inpId) {
             for (int i = 0; i < sVect.size(); i++) {
                 if (sVect[i].getId() == inpId) {
@@ -147,7 +145,6 @@ class StaffManage {
             }
             cout << "[Error] Khong tim thay nhan vien " << inpId << " trong du lieu!\n";
         }
-        //Function 3: Đổi thông tin nhân viên
         void changeInfor(string fixType, string needFixId, string inpId, string inpName, int inpAge, string inpGender, string inpAddress, string inpOnPos, double inpWage) {
             int staffPos = getStaff(needFixId);
             if (staffPos != -1) {
@@ -163,10 +160,8 @@ class StaffManage {
                 cout << "[Error] Khong tim thay nhan vien " << needFixId << " trong du lieu!\n";
             }
         }
-        //Function 4: Sắp xếp nhân viên theo kiểu đầu vào cho trước
         friend bool wageCmp(Staff a, Staff b);
         friend void staffSort(vector<Staff> &v, string mode);
-        //Function 5: Tìm nhân viên theo id
         void findById(string inpId) {
             int posRes = -1;
             if (mode == "ID") {
@@ -199,13 +194,31 @@ class StaffManage {
                 cout << "[Error] Khong tim thay nhan vien can tim\n";
             }
         }
-        //Function 6: Đổi mode sắp xếp
+        void findByName(string name) {
+            vector<Staff> res;
+            for (int i = 0; i < sVect.size(); i++) {
+                if (sVect[i].getName() == name) {
+                    res.push_back(sVect[i]);
+                }
+            }
+            if (res.size() != 0) {
+                cout << "[Infor] Thong tin nhan vien can tim:\n";
+                cout << "---------------------------------------------------------------------------------------------------------------------------------------\n";
+                cout << "| " << setw(10) << "ID" << " | " << setw(20) << "Ho Ten" << " | " << setw(5) << "Age" << " | " << setw(10) << "Gender" << " | " << setw(15) << "Address" << " | " << setw(15) << "On-Position" << " | " << setw(15) << setw(15) << "Base Wage" << " | " << setw(20) << "Wage" << " |" << "\n";
+                cout << "---------------------------------------------------------------------------------------------------------------------------------------\n";
+                for (int i = 0; i < res.size(); i++) {
+                    cout << res[i] << "\n";
+                }   
+                cout << "---------------------------------------------------------------------------------------------------------------------------------------\n";
+            } else {
+                cout << "[Error] Khong tim thay nhan vien can tim\n";
+            }
+        }
         void switchMode() {
             if (mode == "ID") mode = "Wage";
             else mode = "ID";
             cout << "[Alert] Mode had been changed to " << mode << " mode!\n";
         }
-        //Function 7: Tính lương theo thời gian làm việc nhập từ bàn phím
         void calWage(string type, string inpId, vector<float> wTime) {
             if (type == "One") {
                 if (mode == "ID") {
@@ -234,7 +247,6 @@ class StaffManage {
             }
             cout << "[Alert] Da tinh luong!\n";
         }
-        //Function 8: Xuất thông tin nhân viên
         void expData() {
             cout << "[Alert] Thong tin cac nhan vien:\n";
             cout << "---------------------------------------------------------------------------------------------------------------------------------------\n";
@@ -273,7 +285,7 @@ bool idCmp(Staff a, Staff b) {
     return a.getId() < b.getId();
 }
 bool wageCmp(Staff a, Staff b) {
-    return a.getWageAtr().getWage() < b.getWageAtr().getWage();
+    return a < b;
 }
 void staffSort(vector<Staff> &v, string mode) {
     if (mode == "ID") {
@@ -302,7 +314,7 @@ class App {
                 cout << "2. Xoa nhan vien\n";
                 cout << "3. Sua thong tin nhan vien\n";
                 cout << "4. Sap xep nhan vien\n";
-                cout << "5. Tim nhan vien theo ID\n";
+                cout << "5. Tim nhan vien\n";
                 cout << "6. Switch mode " << "[CURR: " << stfm.getMode() << "] [NEXT: " << stfm.getNextMode() << "]\n";
                 cout << "7. Tinh luong\n";
                 cout << "8. Hien thi bang thong tin\n";
@@ -332,10 +344,10 @@ class App {
 
                 if (btn == 3) {
                     cin.ignore();
-                    cout << "[Request] Nhap loai thong tin can sua: ";
-                    string inpType; getline(cin, inpType);
                     cout << "[Request] Nhap ID cua nhan vien can sua: ";
                     string inpId; getline(cin, inpId);
+                    cout << "[Request] Nhap loai thong tin can sua [ID] / [Name] / [Age] / [Gender] / [Address] / [OnPos] / [Wage]\nLua chon: ";
+                    string inpType; getline(cin, inpType);
                     if (inpType == "ID") {
                         cout << "[Request] Nhap ID thay the: ";
                         string fixId; getline(cin, fixId);
@@ -364,6 +376,8 @@ class App {
                         cout << "[Request] Nhap luong thay the: ";
                         double fixWage; cin >> fixWage;
                         stfm.changeInfor(inpType, inpId, "#", "#", -1, "#", "#", "#", fixWage);
+                    } else {
+                        cout << "[Error] Khong co chuc nang nay\n";
                     }
 
                     endFunc;
@@ -379,9 +393,19 @@ class App {
 
                 if (btn == 5) {
                     cin.ignore();
-                    cout << "[Request] Nhap ID de tim kiem: ";
-                    string inpId; getline(cin, inpId);
-                    stfm.findById(inpId);
+                    cout << "[Request] Co 2 loai tim kiem - [ID] / [Name]. Lua chon: ";
+                    string inpType; getline(cin, inpType);
+                    if (inpType == "ID") {
+                        cout << "[Request] Nhap ID de tim kiem: ";
+                        string inpId; getline(cin, inpId);
+                        stfm.findById(inpId);
+                    } else if (inpType == "Name") {
+                        cout << "[Request] Nhap ten de tim kiem: ";
+                        string inpName; getline(cin, inpName);
+                        stfm.findByName(inpName);
+                    } else {
+                        cout << "[Error] Khong co chuc nang nay\n";
+                    }
                     endFunc;
                 }
 
